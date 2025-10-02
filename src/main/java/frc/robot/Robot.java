@@ -12,9 +12,11 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -23,8 +25,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
   private final DifferentialDrive m_robotDrive;
-  private final Joystick m_leftStick;
-  private final Joystick m_rightStick;
+  //private final Joystick m_leftStick;
+  //private final Joystick m_rightStick;
+
+  private final XboxController m_Xbox;
 
   private final TalonFX m_rightMotor1 = new TalonFX(0);
   private final TalonFX m_leftMotor2 = new TalonFX(1);
@@ -51,13 +55,39 @@ public class Robot extends TimedRobot {
     m_leftMotor6.setControl(m_leftFollower);
 
     m_robotDrive = new DifferentialDrive(m_rightMotor1::set, m_leftMotor2::set);
-    m_leftStick = new Joystick(0);
-    m_rightStick = new Joystick(1);
-
+    
+    //changer manette xbox
+    //m_leftStick = new Joystick(0);
+    //m_rightStick = new Joystick(1);
+    m_Xbox = new XboxController(0);
+    
     SendableRegistry.addChild(m_robotDrive, m_rightMotor1);
     SendableRegistry.addChild(m_robotDrive, m_leftMotor2);
 
-    SmartDashboard.putData("Swerve Drive", new Sendable() {
+
+
+    ShuffleboardTab muleTab = Shuffleboard.getTab("muleTab");
+
+    //mule tab
+    
+    muleTab.add("DifferentialDrive",new Sendable() {
+      @Override
+    
+    
+      public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("DifferentialDrive");
+  
+       
+  
+        builder.addDoubleProperty("Front Right Velocity", () -> m_rightMotor1.getVelocity().getValueAsDouble(), null);
+        builder.addDoubleProperty("Front Left Velocity", () -> m_leftMotor2.getVelocity().getValueAsDouble(), null);
+  
+       // builder.addDoubleProperty("Robot Angle", () -> getRotation().getRadians(), null);
+      }
+    });
+
+    //???
+    SmartDashboard.putData("DifferentialDrive", new Sendable() {
     @Override
   
   
@@ -72,13 +102,15 @@ public class Robot extends TimedRobot {
      // builder.addDoubleProperty("Robot Angle", () -> getRotation().getRadians(), null);
     }
   });
-
+   
 
   }
 
 
   @Override
   public void teleopPeriodic() {
-    m_robotDrive.tankDrive(-m_leftStick.getY(), -m_rightStick.getY());
+    //Right and Back are positive
+    m_robotDrive.tankDrive(m_Xbox.getLeftX(), m_Xbox.getLeftY());
+    //m_robotDrive.tankDrive(-m_leftStick.getY(), -m_rightStick.getY());
   }
 }
