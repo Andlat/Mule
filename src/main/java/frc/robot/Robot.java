@@ -10,13 +10,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -25,8 +21,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
   private final DifferentialDrive m_robotDrive;
-  //private final Joystick m_leftStick;
-  //private final Joystick m_rightStick;
 
   private final XboxController m_Xbox;
 
@@ -47,7 +41,10 @@ public class Robot extends TimedRobot {
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    //m_rightMotor.setInverted(true);
+    
+    m_rightMotor1.setInverted(true);
+
+    //joystick right motors right Y joystick, left motors left Y joystick
 
     m_rightMotor3.setControl(m_rightFollower);
     m_leftMotor4.setControl(m_leftFollower);
@@ -56,61 +53,34 @@ public class Robot extends TimedRobot {
 
     m_robotDrive = new DifferentialDrive(m_rightMotor1::set, m_leftMotor2::set);
     
-    //changer manette xbox
-    //m_leftStick = new Joystick(0);
-    //m_rightStick = new Joystick(1);
+    //manette xbox
     m_Xbox = new XboxController(0);
     
     SendableRegistry.addChild(m_robotDrive, m_rightMotor1);
     SendableRegistry.addChild(m_robotDrive, m_leftMotor2);
 
 
-
-    ShuffleboardTab muleTab = Shuffleboard.getTab("muleTab");
-
-    //mule tab
-    
-    muleTab.add("DifferentialDrive",new Sendable() {
-      @Override
-    
-    
-      public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("DifferentialDrive");
-  
-       
-  
-        builder.addDoubleProperty("Front Right Velocity", () -> m_rightMotor1.getVelocity().getValueAsDouble(), null);
-        builder.addDoubleProperty("Front Left Velocity", () -> m_leftMotor2.getVelocity().getValueAsDouble(), null);
-  
-       // builder.addDoubleProperty("Robot Angle", () -> getRotation().getRadians(), null);
-      }
-    });
-
-    //???
     SmartDashboard.putData("DifferentialDrive", new Sendable() {
     @Override
   
   
     public void initSendable(SendableBuilder builder) {
-      builder.setSmartDashboardType("DifferentialDrive");
-
-     
-
-      builder.addDoubleProperty("Front Right Velocity", () -> m_rightMotor1.getVelocity().getValueAsDouble(), null);
-      builder.addDoubleProperty("Front Left Velocity", () -> m_leftMotor2.getVelocity().getValueAsDouble(), null);
-
-     // builder.addDoubleProperty("Robot Angle", () -> getRotation().getRadians(), null);
-    }
-  });
-   
-
+        //drag and drop differential drive
+         builder.setSmartDashboardType("DifferentialDrive");
+    
+          builder.addDoubleProperty("Right Motor Speed", () -> m_rightMotor1.getMotorVoltage().getValueAsDouble(), null);
+          builder.addDoubleProperty("Left Motor Speed", () -> m_leftMotor2.getMotorVoltage().getValueAsDouble(), null);
+        
+          //builder.addDoubleProperty("Robot Angle", () -> getRotation().getRadians().getValueAsDouble(), null);
+        }
+      });
   }
 
-
+  
   @Override
   public void teleopPeriodic() {
     //Right and Back are positive
-    m_robotDrive.tankDrive(m_Xbox.getLeftX(), m_Xbox.getLeftY());
+    m_robotDrive.tankDrive(m_Xbox.getLeftTriggerAxis(), m_Xbox.getRightTriggerAxis());
     //m_robotDrive.tankDrive(-m_leftStick.getY(), -m_rightStick.getY());
   }
 }
