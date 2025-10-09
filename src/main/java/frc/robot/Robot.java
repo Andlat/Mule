@@ -51,6 +51,8 @@ public class Robot extends TimedRobot {
     m_rightMotor5.setControl(m_rightFollower);
     m_leftMotor6.setControl(m_leftFollower);
 
+    //odemotry gyrometre(robot tourner) encodeur(tourner moteur)
+
     m_robotDrive = new DifferentialDrive(m_rightMotor1::set, m_leftMotor2::set);
     
     //manette xbox
